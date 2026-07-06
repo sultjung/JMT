@@ -147,14 +147,11 @@ function renderRecommendations() {
     return;
   }
 
-  const picked = pickRecommendations(scored);
-  const [top, ...alternatives] = picked;
-  const altHtml = alternatives.map((item, index) => renderRestaurantCard(item, index + 2, false)).join("");
+  const picked = pickRecommendations(scored).slice(0, 4);
 
   els.recommendationGrid.innerHTML = `
-    ${renderRestaurantCard(top, 1, true)}
-    <div class="alt-list" aria-label="대안 추천 식당">
-      ${altHtml || `<div class="empty-state">대안 추천을 표시하려면 식당 데이터를 2개 이상 넣어주세요.</div>`}
+    <div class="ranked-list" aria-label="오늘의 추천 순위 목록">
+      ${picked.map((item, index) => renderRestaurantCard(item, index + 1, index === 0)).join("")}
     </div>
   `;
 }
@@ -176,17 +173,16 @@ function pickRecommendations(scored) {
   });
 
   const top = shuffled[0];
-  const alternatives = scored
+  const others = scored
     .filter((item) => item.restaurant.id !== top.restaurant.id)
-    .slice(0, 8)
+    .slice(0, 10)
     .sort((a, b) => {
-      const noiseA = seededNoise(`${todayKey()}-${currentMode}-${nonce}-alt-${a.restaurant.id}`);
-      const noiseB = seededNoise(`${todayKey()}-${currentMode}-${nonce}-alt-${b.restaurant.id}`);
+      const noiseA = seededNoise(`${todayKey()}-${currentMode}-${nonce}-other-${a.restaurant.id}`);
+      const noiseB = seededNoise(`${todayKey()}-${currentMode}-${nonce}-other-${b.restaurant.id}`);
       return noiseB - noiseA;
-    })
-    .slice(0, 3);
+    });
 
-  return [top, ...alternatives];
+  return [top, ...others].slice(0, 4);
 }
 
 function renderRestaurantCard(item, rank, isMain) {
@@ -194,14 +190,13 @@ function renderRestaurantCard(item, rank, isMain) {
   const price = currentMode === MODE_DINNER ? restaurant.dinnerPrice : restaurant.lunchPrice;
   const recentLabel = getRecentVisitLabel(restaurant.id);
   const managerMatch = restaurant.managerPreferenceScore >= 8 ? "반영 높음" : restaurant.managerPreferenceScore >= 5 ? "보통" : "낮음";
-  const reason = buildReason(item);
   const cardClass = isMain ? "rec-card rec-card--main" : "rec-card";
 
   return `
     <article class="${cardClass}">
       <div class="rec-card__inner">
         <div class="rec-card__rank">
-          <span class="rank-badge">${rank === 1 ? "오늘의 1순위" : `대안 ${rank - 1}`}</span>
+          <span class="rank-badge">오늘의 추천 ${rank}순위</span>
           <span class="score-pill"><strong>${Math.round(item.score)}</strong>점</span>
         </div>
 
@@ -221,8 +216,6 @@ function renderRestaurantCard(item, rank, isMain) {
             <div class="meta-item"><span>팀장님 취향</span><strong>${managerMatch}</strong></div>
           </div>
         ` : ""}
-
-        <div class="reason-box">${escapeHtml(reason)}</div>
 
         ${renderExternalLink(restaurant)}
 
@@ -537,20 +530,6 @@ function getRecentCategories(limit) {
     .slice(0, limit)
     .map((entry) => getRestaurantById(entry.id)?.category)
     .filter(Boolean);
-}
-
-function buildReason(item) {
-  const base = item.details.filter(Boolean).slice(0, 3);
-  const restaurant = item.restaurant;
-  const prefix = currentMode === MODE_DINNER
-    ? "회식 조건을 반영했을 때"
-    : "점심 조건을 반영했을 때";
-
-  if (base.length === 0) {
-    return `${prefix} 거리, 가격, 메뉴 구성이 무난해서 추천합니다.`;
-  }
-
-  return `${prefix} ${base.join(", ")} 요소가 좋아서 추천합니다. ${restaurant.notes || ""}`;
 }
 
 function formatPrice(price) {
