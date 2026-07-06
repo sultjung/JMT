@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>우리팀 점심·회식 추천 대시보드</title>
+  <meta name="description" content="대신파이낸스센터 반경 400m 이내 점심·저녁 회식 식당 추천 대시보드" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero__topline">
+        <span class="badge">Daishin Finance Center · 400m</span>
+        <span id="todayText" class="today"></span>
+      </div>
+      <div class="hero__content">
+        <div>
+          <p class="eyebrow">Team Meal Recommender</p>
+          <h1>우리팀 점심·회식 추천 대시보드</h1>
+          <p class="hero__desc">
+            최근 방문 이력과 팀 취향을 반영해서, 오늘 가기 좋은 식당을 점수로 추천합니다.
+          </p>
+        </div>
+        <div class="hero__panel" aria-label="추천 기준 요약">
+          <div>
+            <strong>5명</strong>
+            <span>팀 기준</span>
+          </div>
+          <div>
+            <strong>400m</strong>
+            <span>도보권</span>
+          </div>
+          <div>
+            <strong>3일</strong>
+            <span>방문 감점</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="mode-grid" aria-label="추천 모드 선택">
+        <button class="mode-card is-active" type="button" data-mode="lunch" aria-pressed="true">
+          <span class="mode-card__icon">🍱</span>
+          <span>
+            <strong>점심 메뉴 추천</strong>
+            <em>빠르고 무난한 직장인 점심</em>
+          </span>
+        </button>
+        <button class="mode-card" type="button" data-mode="dinner" aria-pressed="false">
+          <span class="mode-card__icon">🍻</span>
+          <span>
+            <strong>저녁 회식 추천</strong>
+            <em>인원·분위기·예산 반영</em>
+          </span>
+        </button>
+      </section>
+
+      <section id="dinnerControls" class="control-panel is-hidden" aria-label="저녁 회식 조건 입력">
+        <div class="field">
+          <label for="partySize">회식 인원</label>
+          <input id="partySize" type="number" min="2" max="30" value="5" inputmode="numeric" />
+        </div>
+        <div class="field">
+          <label for="dinnerMood">원하는 분위기</label>
+          <select id="dinnerMood">
+            <option value="quiet">조용한 식사</option>
+            <option value="meat">고기/회식 분위기</option>
+            <option value="alcohol">술 한잔 가능</option>
+            <option value="clean">깔끔한 식당</option>
+            <option value="value">가성비 우선</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="budgetBand">1인당 예상 예산</label>
+          <select id="budgetBand">
+            <option value="10000">1만원대</option>
+            <option value="20000" selected>2만원대</option>
+            <option value="30000">3만원대 이상</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="toolbar" aria-label="추천 조작">
+        <div>
+          <h2 id="resultTitle">오늘의 점심 추천</h2>
+          <p id="resultSubtitle">최근 방문한 곳은 자동으로 우선순위를 낮춥니다.</p>
+        </div>
+        <div class="toolbar__buttons">
+          <button id="rerollButton" class="btn btn--primary" type="button">추천 다시 돌리기</button>
+          <button id="toggleDataButton" class="btn btn--ghost" type="button">식당 데이터 보기</button>
+        </div>
+      </section>
+
+      <section class="api-status card" aria-label="식당 데이터 연동 상태">
+        <div>
+          <p class="eyebrow">Naver Local Search</p>
+          <h2>식당 데이터 연동 상태</h2>
+          <p id="dataSourceNotice">초기 샘플 데이터로 실행 중입니다.</p>
+        </div>
+        <div class="api-status__items">
+          <span id="dataSourceText">샘플 데이터</span>
+          <span id="restaurantCountText">0개 식당</span>
+          <span id="lastSyncedText">동기화 전</span>
+        </div>
+      </section>
+
+      <section id="recommendationGrid" class="recommendation-grid" aria-live="polite"></section>
+
+      <section class="bottom-grid">
+        <article class="card history-card">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">History</p>
+              <h2>최근 방문 이력</h2>
+            </div>
+            <button id="clearHistoryButton" class="text-button" type="button">방문 이력 초기화</button>
+          </div>
+          <div id="historyList" class="history-list"></div>
+        </article>
+
+        <article class="card logic-card">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Scoring</p>
+              <h2>추천 기준</h2>
+            </div>
+          </div>
+          <ul class="score-list">
+            <li><span>거리</span><strong>가까울수록 가점</strong></li>
+            <li><span>취향</span><strong>국밥·찌개·한식 가점</strong></li>
+            <li><span>이력</span><strong>최근 3일 방문 큰 감점</strong></li>
+            <li><span>회식</span><strong>인원·예산·술 적합도 반영</strong></li>
+          </ul>
+        </article>
+      </section>
+
+      <section id="dataPanel" class="data-panel is-hidden" aria-label="식당 데이터 원본">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Data Source</p>
+            <h2>restaurants.js 데이터</h2>
+          </div>
+          <button id="closeDataButton" class="text-button" type="button">닫기</button>
+        </div>
+        <pre id="dataJson"></pre>
+      </section>
+    </main>
+  </div>
+
+  <script src="restaurants.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
