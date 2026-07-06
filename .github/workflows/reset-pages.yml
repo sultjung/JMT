@@ -1,0 +1,33 @@
+name: Reset GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  reset-pages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reset Pages settings
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -L -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${GITHUB_REPOSITORY}/pages \
+            -d '{"cname":null,"https_enforced":true,"build_type":"legacy","source":{"branch":"main","path":"/"}}'
+
+      - name: Trigger Pages rebuild
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > .pages-rebuild
+          git add .pages-rebuild
+          git commit -m "Reset GitHub Pages settings"
+          git push
