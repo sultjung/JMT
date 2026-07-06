@@ -1,0 +1,42 @@
+name: Sync Naver Restaurants
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 평일 오전 10:30 KST = 01:30 UTC
+    - cron: "30 1 * * 1-5"
+
+permissions:
+  contents: write
+
+jobs:
+  sync-restaurants:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Fetch restaurants from Naver Local Search
+        env:
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+        run: python scripts/fetch_naver_restaurants.py
+
+      - name: Commit updated restaurants.js
+        run: |
+          if git diff --quiet restaurants.js; then
+            echo "No restaurant data changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add restaurants.js
+          git commit -m "Sync Naver restaurant data"
+          git push
