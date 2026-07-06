@@ -2,12 +2,6 @@ const STATE_KEY = "teamMealDashboardState.v1";
 const MODE_LUNCH = "lunch";
 const MODE_DINNER = "dinner";
 
-const DEFAULT_OFFICE = {
-  name: "대신파이낸스센터",
-  lat: 37.5651225406354,
-  lon: 126.987055821012
-};
-
 const moodMap = {
   quiet: { label: "조용한 식사", requiredTags: ["조용한식사", "깔끔함"], alcoholBonus: 0 },
   meat: { label: "고기/회식 분위기", requiredTags: ["고기", "회식"], alcoholBonus: 4 },
@@ -19,7 +13,6 @@ const moodMap = {
 const els = {};
 let state = loadState();
 let currentMode = MODE_LUNCH;
-let topRouteMapInstance = null;
 
 function boot() {
   cacheElements();
@@ -149,11 +142,6 @@ function renderDataStatus() {
 function renderRecommendations() {
   const scored = getScoredRestaurants(currentMode);
 
-  if (topRouteMapInstance) {
-    topRouteMapInstance.remove();
-    topRouteMapInstance = null;
-  }
-
   if (scored.length === 0) {
     els.recommendationGrid.innerHTML = `<div class="empty-state">조건에 맞는 식당이 없습니다. restaurants.js에서 식당 데이터를 추가하거나 조건을 완화해 주세요.</div>`;
     return;
@@ -169,8 +157,6 @@ function renderRecommendations() {
       ${altHtml || `<div class="empty-state">대안 추천을 표시하려면 식당 데이터를 2개 이상 넣어주세요.</div>`}
     </div>
   `;
-
-  window.requestAnimationFrame(() => renderTopRouteMap(top.restaurant));
 }
 
 function pickRecommendations(scored) {
@@ -237,8 +223,9 @@ function renderRestaurantCard(item, rank, isMain) {
         ` : ""}
 
         <div class="reason-box">${escapeHtml(reason)}</div>
-        ${isMain ? renderRouteMapBox(restaurant) : ""}
+
         ${renderExternalLink(restaurant)}
+
         <div class="tag-row">
           ${restaurant.tags.map((tag) => `<span class="tag">#${escapeHtml(tag)}</span>`).join("")}
         </div>
@@ -254,130 +241,21 @@ function renderRestaurantCard(item, rank, isMain) {
   `;
 }
 
-function renderRouteMapBox(restaurant) {
-  return `
-    <div class="route-map-wrap">
-      <div class="route-map-title">
-        <strong>회사에서 도보 경로 미리보기</strong>
-        <span>${escapeHtml(getOffice().name)} → ${escapeHtml(restaurant.name)}</span>
-      </div>
-      <div id="top-route-map" class="route-map" aria-label="회사에서 추천 식당까지의 도보 지도"></div>
-      <div class="route-map-caption">
-        지도는 도보 경로 참고용입니다. 실제 이동 시간은 횡단보도, 지하 연결 통로, 건물 출입구 위치에 따라 달라질 수 있습니다.
-      </div>
-    </div>
-  `;
-}
-
 function renderExternalLink(restaurant) {
   const link = buildNaverMapSearchUrl(restaurant);
   return `<a class="external-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">네이버지도에서 보기</a>`;
 }
 
 function buildNaverMapSearchUrl(restaurant) {
-  const keyword = [restaurant.name, restaurant.roadAddress || restaurant.address || ""]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-
+  const keyword = normalizeRestaurantName(restaurant.name);
   return `https://map.naver.com/p/search/${encodeURIComponent(keyword)}`;
 }
 
-async function renderTopRouteMap(restaurant) {
-  const mapEl = document.querySelector("#top-route-map");
-  if (!mapEl) return;
-
-  if (typeof L === "undefined") {
-    mapEl.innerHTML = `<div class="route-map-fallback">지도 라이브러리를 불러오지 못했습니다.<br>잠시 후 새로고침하거나 네이버지도에서 보기 버튼을 이용해 주세요.</div>`;
-    return;
-  }
-
-  const office = getOffice();
-  const destLat = toNumber(restaurant.lat ?? restaurant.latitude);
-  const destLon = toNumber(restaurant.lon ?? restaurant.lng ?? restaurant.longitude);
-
-  if (!isValidCoord(office.lat, office.lon) || !isValidCoord(destLat, destLon)) {
-    mapEl.innerHTML = `<div class="route-map-fallback">좌표 정보가 없어 지도 미리보기를 표시할 수 없습니다.<br>restaurants.js의 lat/lon 값을 확인해 주세요.</div>`;
-    return;
-  }
-
-  if (topRouteMapInstance) {
-    topRouteMapInstance.remove();
-    topRouteMapInstance = null;
-  }
-
-  topRouteMapInstance = L.map(mapEl, {
-    zoomControl: false,
-    attributionControl: false,
-    dragging: true,
-    scrollWheelZoom: false,
-    doubleClickZoom: false,
-    boxZoom: false,
-    keyboard: false,
-    tap: true
-  });
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19
-  }).addTo(topRouteMapInstance);
-
-  const start = [office.lat, office.lon];
-  const end = [destLat, destLon];
-
-  L.marker(start).addTo(topRouteMapInstance).bindPopup(office.name);
-  L.marker(end).addTo(topRouteMapInstance).bindPopup(restaurant.name);
-
-  try {
-    const route = await fetchWalkingRoute(office.lon, office.lat, destLon, destLat);
-
-    if (route && route.length > 1) {
-      const polyline = L.polyline(route, {
-        weight: 5,
-        opacity: 0.9
-      }).addTo(topRouteMapInstance);
-
-      topRouteMapInstance.fitBounds(polyline.getBounds(), {
-        padding: [22, 22]
-      });
-      return;
-    }
-  } catch (error) {
-    console.warn("도보 경로 불러오기 실패:", error);
-  }
-
-  const fallbackLine = L.polyline([start, end], {
-    weight: 4,
-    opacity: 0.75,
-    dashArray: "8, 7"
-  }).addTo(topRouteMapInstance);
-
-  topRouteMapInstance.fitBounds(fallbackLine.getBounds(), {
-    padding: [22, 22]
-  });
-}
-
-async function fetchWalkingRoute(startLon, startLat, endLon, endLat) {
-  const url = `https://router.project-osrm.org/route/v1/foot/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`;
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error("도보 경로 API 응답 실패");
-  }
-
-  const data = await response.json();
-  const coords = data?.routes?.[0]?.geometry?.coordinates;
-  if (!Array.isArray(coords) || coords.length === 0) return null;
-
-  return coords.map(([lon, lat]) => [lat, lon]);
-}
-
-function getOffice() {
-  const meta = window.RESTAURANTS_META || {};
-  return {
-    name: meta.baseName || DEFAULT_OFFICE.name,
-    lat: toNumber(meta.baseLat) || DEFAULT_OFFICE.lat,
-    lon: toNumber(meta.baseLon ?? meta.baseLng) || DEFAULT_OFFICE.lon
-  };
+function normalizeRestaurantName(name) {
+  return String(name || "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function renderHistory() {
@@ -737,16 +615,6 @@ function seededNoise(seed) {
     hash = Math.imul(hash, 16777619);
   }
   return (hash >>> 0) / 4294967295;
-}
-
-function toNumber(value) {
-  if (value === null || value === undefined || value === "") return null;
-  const number = Number(value);
-  return Number.isFinite(number) ? number : null;
-}
-
-function isValidCoord(lat, lon) {
-  return Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
 }
 
 function escapeHtml(value) {
