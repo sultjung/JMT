@@ -336,10 +336,13 @@ button {
 }
 
 .recommendation-grid {
+  display: block;
+}
+
+.ranked-list {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  grid-template-columns: 1fr;
   gap: 18px;
-  align-items: start;
 }
 
 .rec-card {
@@ -352,7 +355,7 @@ button {
 }
 
 .rec-card--main {
-  min-height: 420px;
+  min-height: auto;
 }
 
 .rec-card::before {
@@ -411,7 +414,7 @@ button {
 }
 
 .rec-card:not(.rec-card--main) h3 {
-  font-size: 21px;
+  font-size: 28px;
 }
 
 .menu-line {
@@ -453,72 +456,6 @@ button {
   letter-spacing: -0.03em;
 }
 
-.reason-box {
-  padding: 16px;
-  border-radius: 18px;
-  color: var(--navy);
-  background: linear-gradient(135deg, rgba(24,34,53,0.06), rgba(243,115,33,0.08));
-  line-height: 1.58;
-  font-weight: 650;
-}
-
-.route-map-wrap {
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
-}
-
-.route-map-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 9px;
-  color: var(--navy);
-  font-size: 14px;
-  font-weight: 900;
-}
-
-.route-map-title span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.route-map {
-  width: 100%;
-  height: 230px;
-  border: 1px solid rgba(15, 23, 42, 0.10);
-  border-radius: 18px;
-  overflow: hidden;
-  background: #eef2f7;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.65);
-}
-
-.route-map-caption {
-  margin-top: 8px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.5;
-}
-
-.route-map-fallback {
-  display: grid;
-  place-items: center;
-  height: 100%;
-  padding: 18px;
-  color: var(--muted);
-  text-align: center;
-  font-size: 13px;
-  font-weight: 750;
-  line-height: 1.55;
-}
-
-.leaflet-container {
-  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
-}
-
 .tag-row {
   display: flex;
   gap: 7px;
@@ -556,28 +493,6 @@ button {
 .visit-btn:hover {
   color: #fff;
   background: var(--navy);
-}
-
-.alt-list {
-  display: grid;
-  gap: 14px;
-}
-
-.alt-list .rec-card {
-  box-shadow: 0 12px 30px rgba(19, 27, 45, 0.07);
-}
-
-.alt-list .rec-card__inner {
-  padding: 20px;
-}
-
-.alt-list .meta-grid {
-  grid-template-columns: repeat(3, 1fr);
-  margin: 16px 0;
-}
-
-.alt-list .visit-actions {
-  grid-template-columns: repeat(2, 1fr);
 }
 
 .bottom-grid {
@@ -749,7 +664,7 @@ button {
   display: inline-flex;
   align-items: center;
   width: fit-content;
-  margin: 10px 0 2px;
+  margin: 6px 0 2px;
   color: var(--brand-dark);
   font-size: 13px;
   font-weight: 800;
@@ -767,7 +682,6 @@ button {
 
 @media (max-width: 920px) {
   .hero__content,
-  .recommendation-grid,
   .bottom-grid {
     grid-template-columns: 1fr;
   }
@@ -830,13 +744,5 @@ button {
 
   .btn {
     flex: 1;
-  }
-
-  .alt-list .visit-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .route-map {
-    height: 210px;
   }
 }
