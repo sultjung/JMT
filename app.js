@@ -209,9 +209,17 @@ function renderRestaurantCard(item, rank, isMain) {
 }
 
 function renderExternalLink(restaurant) {
-  const link = restaurant.naverLink || restaurant.link;
-  if (!link) return "";
-  return `<a class="external-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">네이버에서 보기</a>`;
+  const link = buildNaverMapSearchUrl(restaurant);
+  return `<a class="external-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">네이버지도에서 보기</a>`;
+}
+
+function buildNaverMapSearchUrl(restaurant) {
+  const keyword = [restaurant.name, restaurant.roadAddress || restaurant.address || ""]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+  return `https://map.naver.com/p/search/${encodeURIComponent(keyword)}`;
 }
 
 function renderHistory() {
