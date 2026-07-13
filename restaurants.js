@@ -26,7 +26,7 @@ window.RESTAURANTS_META = {
   ],
   "errors": [],
   "notice": "가격·메뉴·단체 가능 여부는 네이버 지역검색 카테고리 기반 추정값입니다. 운영 전 확인하세요.",
-  "generatedAt": "2026-07-10T21:11:21+09:00",
+  "generatedAt": "2026-07-13T21:21:02+09:00",
   "count": 22
 };
 
