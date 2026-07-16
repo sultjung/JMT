@@ -26,8 +26,8 @@ window.RESTAURANTS_META = {
   ],
   "errors": [],
   "notice": "가격·메뉴·단체 가능 여부는 네이버 지역검색 카테고리 기반 추정값입니다. 운영 전 확인하세요.",
-  "generatedAt": "2026-07-15T18:24:05+09:00",
-  "count": 22
+  "generatedAt": "2026-07-16T18:33:37+09:00",
+  "count": 23
 };
 
 window.RESTAURANTS = [
@@ -275,6 +275,35 @@ window.RESTAURANTS = [
     "address": "서울특별시 중구 명동1가 48-2",
     "lat": 37.5641571,
     "lon": 126.9845147
+  },
+  {
+    "id": "naver-restaurant-78e67537",
+    "name": "명동충무김밥",
+    "category": "분식",
+    "mainMenu": "음식점>분식",
+    "recommendedMenu": "김밥/라면/우동 세트",
+    "lunchPrice": 11000,
+    "dinnerPrice": 16000,
+    "distanceMeters": 275,
+    "walkMinutes": 4,
+    "tags": [
+      "가성비"
+    ],
+    "goodForLunch": true,
+    "goodForDinner": false,
+    "groupFriendly": false,
+    "alcoholFriendly": false,
+    "managerPreferenceScore": 4,
+    "notes": "네이버 지역검색에서 자동 수집했습니다. 가격·메뉴·회식 적합도는 카테고리 기반 추정값이므로 운영 전 확인하세요.",
+    "lastVisitedDate": null,
+    "dislike": false,
+    "favorite": false,
+    "source": "naver-local-search",
+    "naverLink": "",
+    "roadAddress": "서울특별시 중구 명동10길 16",
+    "address": "서울특별시 중구 명동2가 32-11",
+    "lat": 37.5631379,
+    "lon": 126.9851971
   },
   {
     "id": "naver-3-b6ce3118",
