@@ -26,8 +26,8 @@ window.RESTAURANTS_META = {
   ],
   "errors": [],
   "notice": "가격·메뉴·단체 가능 여부는 네이버 지역검색 카테고리 기반 추정값입니다. 운영 전 확인하세요.",
-  "generatedAt": "2026-07-17T18:23:14+09:00",
-  "count": 23
+  "generatedAt": "2026-07-20T20:30:39+09:00",
+  "count": 22
 };
 
 window.RESTAURANTS = [
@@ -337,36 +337,6 @@ window.RESTAURANTS = [
     "address": "서울특별시 중구 을지로3가 346-1 1층 1호",
     "lat": 37.5660827,
     "lon": 126.9900656
-  },
-  {
-    "id": "naver-restaurant-56838e61",
-    "name": "미성옥",
-    "category": "한식/국탕류",
-    "mainMenu": "한식>곰탕,설렁탕",
-    "recommendedMenu": "대표 식사 메뉴",
-    "lunchPrice": 13000,
-    "dinnerPrice": 22000,
-    "distanceMeters": 292,
-    "walkMinutes": 4,
-    "tags": [
-      "팀장님취향",
-      "한식"
-    ],
-    "goodForLunch": true,
-    "goodForDinner": true,
-    "groupFriendly": true,
-    "alcoholFriendly": false,
-    "managerPreferenceScore": 8,
-    "notes": "네이버 지역검색에서 자동 수집했습니다. 가격·메뉴·회식 적합도는 카테고리 기반 추정값이므로 운영 전 확인하세요.",
-    "lastVisitedDate": null,
-    "dislike": false,
-    "favorite": false,
-    "source": "naver-local-search",
-    "naverLink": "",
-    "roadAddress": "서울특별시 중구 명동길 25-11",
-    "address": "서울특별시 중구 명동1가 54-6",
-    "lat": 37.5641835,
-    "lon": 126.9839596
   },
   {
     "id": "naver-restaurant-3b1efe65",
