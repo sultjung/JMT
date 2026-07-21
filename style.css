@@ -60,8 +60,8 @@ button {
   padding: 28px;
   color: #fff;
   background:
-    linear-gradient(135deg, rgba(24, 34, 53, 0.98), rgba(31, 43, 66, 0.96)),
-    radial-gradient(circle at 90% 10%, rgba(243, 115, 33, 0.95), transparent 22rem);
+    linear-gradient(135deg, #f37321 0%, #df5d16 52%, #c94f12 100%),
+    radial-gradient(circle at 90% 10%, rgba(255, 194, 124, 0.9), transparent 22rem);
   box-shadow: var(--shadow);
 }
 
@@ -73,7 +73,7 @@ button {
   width: 330px;
   height: 330px;
   border-radius: 50%;
-  background: rgba(243, 115, 33, 0.22);
+  background: rgba(255, 208, 153, 0.24);
 }
 
 .hero__topline,
