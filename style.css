@@ -1,5 +1,5 @@
 :root {
-  --bg: #f5f6fa;
+  --bg: #fff1e6;
   --surface: #ffffff;
   --surface-soft: #fbfbfd;
   --ink: #151a24;
@@ -33,8 +33,8 @@ body {
   font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--ink);
   background:
-    radial-gradient(circle at top left, rgba(243, 115, 33, 0.16), transparent 32rem),
-    linear-gradient(180deg, #fbfbfd 0%, var(--bg) 58%, #eef1f7 100%);
+    radial-gradient(circle at top left, rgba(243, 115, 33, 0.24), transparent 32rem),
+    linear-gradient(180deg, #fffaf5 0%, var(--bg) 58%, #ffe8d2 100%);
 }
 
 button,
